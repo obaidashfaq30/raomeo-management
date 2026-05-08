@@ -141,7 +141,7 @@ npm run dev
 npm run build
 ```
 
-Set `VITE_API_BASE_URL` in `frontend/.env` when the API is not running on `http://localhost:3000/api/v1`.
+By default the React app uses `VITE_API_BASE_URL=/api/v1` and Vite proxies `/api` to Rails, which keeps local Docker development on the same browser origin and avoids CORS issues. Set `VITE_API_PROXY_TARGET` in `frontend/.env` if the Rails API is not running on `http://localhost:3000`.
 
 ## Mobile App Development
 

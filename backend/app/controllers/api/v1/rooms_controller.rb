@@ -16,12 +16,14 @@ module Api
       end
 
       def create
-        authorize_roles!(:admin, :manager)
+        return unless authorize_roles!(:admin, :manager)
+
         render_success(Room.create!(room_params), status: :created)
       end
 
       def update
-        authorize_roles!(:admin, :manager)
+        return unless authorize_roles!(:admin, :manager)
+
         @room.update!(room_params)
         render_success(@room)
       end
@@ -33,7 +35,8 @@ module Api
       end
 
       def destroy
-        authorize_roles!(:admin)
+        return unless authorize_roles!(:admin)
+
         @room.update!(status: :out_of_service)
         render_success(@room)
       end

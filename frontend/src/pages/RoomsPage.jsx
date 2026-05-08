@@ -1,46 +1,208 @@
-import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Plus, RefreshCw } from "lucide-react";
 import { endpoints } from "../api/client";
 import DataTable from "../components/ui/DataTable.jsx";
+import { useAuthStore } from "../store/authStore";
+
+const initialForm = {
+  room_category_id: "",
+  number: "",
+  floor: "",
+  status: "available",
+  rate_override: ""
+};
+
+const statusOptions = ["available", "reserved", "occupied", "cleaning", "maintenance", "out_of_service"];
 
 export default function RoomsPage() {
   const [rooms, setRooms] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState("");
+  const [form, setForm] = useState(initialForm);
+  const [errors, setErrors] = useState({});
+  const [notice, setNotice] = useState("");
+  const [saving, setSaving] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const canManageRooms = ["admin", "manager"].includes(user?.role);
 
-  useEffect(() => {
+  const loadRooms = useCallback(() => {
     endpoints.rooms(status ? { status } : {}).then((response) => setRooms(response.data.data)).catch(() => setRooms([]));
   }, [status]);
 
+  useEffect(() => {
+    loadRooms();
+  }, [loadRooms]);
+
+  useEffect(() => {
+    endpoints.roomCategories().then((response) => setCategories(response.data.data)).catch(() => setCategories([]));
+  }, []);
+
+  const validationErrors = useMemo(() => {
+    const next = {};
+    if (!form.room_category_id) next.room_category_id = "Select a category";
+    if (!form.number.trim()) next.number = "Enter a room number";
+    if (form.floor === "") next.floor = "Enter a floor";
+    if (form.floor !== "" && Number.isNaN(Number(form.floor))) next.floor = "Floor must be a number";
+    if (Number(form.floor) < 0) next.floor = "Floor cannot be negative";
+    if (form.rate_override && Number.isNaN(Number(form.rate_override))) next.rate_override = "Rate must be a number";
+    if (form.rate_override && Number(form.rate_override) < 0) next.rate_override = "Rate cannot be negative";
+    return next;
+  }, [form]);
+
+  const submit = async (event) => {
+    event.preventDefault();
+    setNotice("");
+
+    if (!canManageRooms) {
+      setNotice("Only admin and manager accounts can create rooms.");
+      return;
+    }
+
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
+
+    const payload = {
+      room_category_id: form.room_category_id,
+      number: form.number.trim(),
+      floor: Number(form.floor),
+      status: form.status
+    };
+
+    if (form.rate_override) {
+      payload.rate_override_cents = Math.round(Number(form.rate_override) * 100);
+    }
+
+    setSaving(true);
+    try {
+      await endpoints.createRoom(payload);
+      setForm(initialForm);
+      setErrors({});
+      setNotice("Room created.");
+      loadRooms();
+    } catch (error) {
+      const message = error.response?.data?.error;
+      setNotice(Array.isArray(message) ? message.join(", ") : message || "Unable to create room.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
-    <div className="space-y-5">
-      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="text-2xl font-semibold text-ink">Room Inventory</h1>
-          <p className="mt-1 text-sm text-slate-500">Categories, pricing, amenities, and live room state</p>
+    <div className="grid gap-6 xl:grid-cols-[0.72fr_1.28fr]">
+      <form onSubmit={submit} className="rounded-lg border border-slate-200 bg-white p-5 shadow-panel">
+        <div className="mb-5 flex items-center gap-2">
+          <Plus className="text-harbor" size={20} />
+          <h1 className="text-lg font-semibold text-ink">New Room</h1>
         </div>
-        <button className="inline-flex h-10 items-center gap-2 rounded-lg bg-harbor px-4 text-sm font-semibold text-white">
-          <Plus size={18} />
-          New Room
-        </button>
-      </div>
-      <select className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm" value={status} onChange={(event) => setStatus(event.target.value)}>
-        <option value="">All statuses</option>
-        <option value="available">Available</option>
-        <option value="reserved">Reserved</option>
-        <option value="occupied">Occupied</option>
-        <option value="cleaning">Cleaning</option>
-        <option value="maintenance">Maintenance</option>
-      </select>
-      <DataTable
-        columns={[
-          { key: "number", label: "Room" },
-          { key: "floor", label: "Floor" },
-          { key: "status", label: "Status", badge: true },
-          { key: "category", label: "Category", render: (room) => room.room_category?.name },
-          { key: "rate", label: "Rate", render: (room) => `$${((room.rate_override_cents || room.room_category?.base_rate_cents || 0) / 100).toFixed(2)}` }
-        ]}
-        rows={rooms}
-      />
+        <div className="space-y-4">
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium text-slate-700">Category</span>
+            <select
+              className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm"
+              disabled={!canManageRooms}
+              value={form.room_category_id}
+              onChange={(event) => setForm({ ...form, room_category_id: event.target.value })}
+            >
+              <option value="">Select category</option>
+              {categories.map((category) => (
+                <option value={category.id} key={category.id}>{category.name}</option>
+              ))}
+            </select>
+            {errors.room_category_id && <span className="text-xs text-coral">{errors.room_category_id}</span>}
+          </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium text-slate-700">Room number</span>
+              <input
+                className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm"
+                disabled={!canManageRooms}
+                value={form.number}
+                onChange={(event) => setForm({ ...form, number: event.target.value })}
+                placeholder="401"
+              />
+              {errors.number && <span className="text-xs text-coral">{errors.number}</span>}
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium text-slate-700">Floor</span>
+              <input
+                type="number"
+                min="0"
+                className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm"
+                disabled={!canManageRooms}
+                value={form.floor}
+                onChange={(event) => setForm({ ...form, floor: event.target.value })}
+              />
+              {errors.floor && <span className="text-xs text-coral">{errors.floor}</span>}
+            </label>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium text-slate-700">Status</span>
+              <select
+                className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm capitalize"
+                disabled={!canManageRooms}
+                value={form.status}
+                onChange={(event) => setForm({ ...form, status: event.target.value })}
+              >
+                {statusOptions.map((option) => (
+                  <option value={option} key={option}>{option.replace(/_/g, " ")}</option>
+                ))}
+              </select>
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-sm font-medium text-slate-700">Override rate</span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm"
+                disabled={!canManageRooms}
+                value={form.rate_override}
+                onChange={(event) => setForm({ ...form, rate_override: event.target.value })}
+                placeholder="Optional"
+              />
+              {errors.rate_override && <span className="text-xs text-coral">{errors.rate_override}</span>}
+            </label>
+          </div>
+          {notice && (
+            <p className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-700">{notice}</p>
+          )}
+          <button
+            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-harbor font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+            disabled={saving || !canManageRooms}
+          >
+            {saving ? <RefreshCw className="animate-spin" size={17} /> : <Plus size={17} />}
+            Create Room
+          </button>
+          {!canManageRooms && (
+            <p className="text-xs text-slate-500">Sign in as an admin or manager to manage room inventory.</p>
+          )}
+        </div>
+      </form>
+      <section className="space-y-5">
+        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+          <div>
+            <h1 className="text-2xl font-semibold text-ink">Room Inventory</h1>
+            <p className="mt-1 text-sm text-slate-500">Categories, pricing, amenities, and live room state</p>
+          </div>
+          <select className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm" value={status} onChange={(event) => setStatus(event.target.value)}>
+            <option value="">All statuses</option>
+            {statusOptions.map((option) => (
+              <option value={option} key={option}>{option.replace(/_/g, " ")}</option>
+            ))}
+          </select>
+        </div>
+        <DataTable
+          columns={[
+            { key: "number", label: "Room" },
+            { key: "floor", label: "Floor" },
+            { key: "status", label: "Status", badge: true },
+            { key: "category", label: "Category", render: (room) => room.room_category?.name },
+            { key: "rate", label: "Rate", render: (room) => `$${((room.rate_override_cents || room.room_category?.base_rate_cents || 0) / 100).toFixed(2)}` }
+          ]}
+          rows={rooms}
+        />
+      </section>
     </div>
   );
 }

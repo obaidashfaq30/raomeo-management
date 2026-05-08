@@ -23,7 +23,8 @@ module Api
       end
 
       def refund
-        authorize_roles!(:admin, :manager, :accountant)
+        return unless authorize_roles!(:admin, :manager, :accountant)
+
         invoice = Invoice.find(params[:id])
         Refund.create!(
           invoice: invoice,
