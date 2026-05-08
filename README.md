@@ -6,6 +6,7 @@ Raomeo Management is a full-stack hotel management monorepo with a Rails API bac
 
 - `backend/` Ruby on Rails API, PostgreSQL schema, service objects, jobs, RSpec, OpenAPI docs
 - `frontend/` React, React Router, Zustand, Axios, TailwindCSS, Recharts
+- `mobile/` React Native app built with Expo, React Navigation, Zustand, Axios
 - `docker-compose.yml` PostgreSQL, Redis, Rails API, Sidekiq, React dev server
 - `.github/workflows/ci.yml` backend and frontend CI checks
 
@@ -141,6 +142,31 @@ npm run build
 ```
 
 Set `VITE_API_BASE_URL` in `frontend/.env` when the API is not running on `http://localhost:3000/api/v1`.
+
+## Mobile App Development
+
+The mobile app lives in `mobile/` and uses Expo.
+
+Start the API stack first:
+
+```bash
+docker compose up -d
+```
+
+Run the mobile app:
+
+```bash
+cd mobile
+cp .env.example .env
+npm install
+npm run start
+```
+
+API URL notes:
+
+- Android emulator uses `http://10.0.2.2:3000/api/v1` by default.
+- iOS simulator can use `EXPO_PUBLIC_API_BASE_URL=http://localhost:3000/api/v1`.
+- Physical devices need your computer LAN IP, for example `EXPO_PUBLIC_API_BASE_URL=http://192.168.1.20:3000/api/v1`.
 
 ## Scaling Notes
 
