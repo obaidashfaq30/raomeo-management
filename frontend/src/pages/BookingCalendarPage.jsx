@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { CalendarRange, ChevronLeft, ChevronRight, Hotel, Layers3 } from "lucide-react";
 import clsx from "clsx";
 import { endpoints } from "../api/client";
+import GlassSelect from "../components/ui/GlassSelect.jsx";
 import StatCard from "../components/ui/StatCard.jsx";
 import StatusBadge from "../components/ui/StatusBadge.jsx";
 
@@ -9,7 +10,15 @@ const DAY_WIDTH = 74;
 const ROOM_COLUMN_WIDTH = 240;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const rangeOptions = [14, 21, 30, 60];
-const statusOptions = ["", "draft", "confirmed", "checked_in", "checked_out", "cancelled", "no_show"];
+const statusOptions = [
+  { value: "", label: "All statuses" },
+  { value: "draft", label: "Draft" },
+  { value: "confirmed", label: "Confirmed" },
+  { value: "checked_in", label: "Checked in" },
+  { value: "checked_out", label: "Checked out" },
+  { value: "cancelled", label: "Cancelled" },
+  { value: "no_show", label: "No show" }
+];
 
 const bookingStyles = {
   draft: "border-saffron/30 bg-saffron/85 text-amber-950",
@@ -137,6 +146,13 @@ export default function BookingCalendarPage() {
 
   const dates = useMemo(() => buildDateRange(startDate, days), [days, startDate]);
   const gridTemplateColumns = `${ROOM_COLUMN_WIDTH}px repeat(${days}, ${DAY_WIDTH}px)`;
+  const categoryOptions = useMemo(
+    () => [
+      { value: "", label: "All categories" },
+      ...categories.map((category) => ({ value: String(category.id), label: category.name }))
+    ],
+    [categories]
+  );
 
   const calendarRows = useMemo(() => {
     const reservationsByRoom = new Map();
@@ -199,17 +215,8 @@ export default function BookingCalendarPage() {
           </div>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-[150px_150px_160px_150px_auto]">
             <input className="field-glass" type="date" value={startDate} onChange={(event) => event.target.value && setStartDate(event.target.value)} />
-            <select className="field-glass" value={status} onChange={(event) => setStatus(event.target.value)}>
-              {statusOptions.map((option) => (
-                <option key={option || "all"} value={option}>{option ? option.replace(/_/g, " ") : "All statuses"}</option>
-              ))}
-            </select>
-            <select className="field-glass" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
-              <option value="">All categories</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>{category.name}</option>
-              ))}
-            </select>
+            <GlassSelect value={status} onChange={setStatus} options={statusOptions} />
+            <GlassSelect value={categoryId} onChange={setCategoryId} options={categoryOptions} />
             <button className="field-glass font-bold text-harbor" type="button" onClick={() => setBookedOnly((value) => !value)}>
               {bookedOnly ? "Booked lanes" : "All rooms"}
             </button>

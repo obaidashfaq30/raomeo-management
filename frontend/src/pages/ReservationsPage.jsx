@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { CalendarPlus, CalendarRange } from "lucide-react";
 import { endpoints } from "../api/client";
 import DataTable from "../components/ui/DataTable.jsx";
+import GlassSelect from "../components/ui/GlassSelect.jsx";
 
 const initialForm = {
   room_category_id: "",
@@ -34,6 +35,13 @@ export default function ReservationsPage() {
     if (form.check_in_date && form.check_out_date && form.check_out_date <= form.check_in_date) next.check_out_date = "After check-in";
     return next;
   }, [form]);
+  const categoryOptions = useMemo(
+    () => [
+      { value: "", label: "Select category" },
+      ...categories.map((category) => ({ value: String(category.id), label: category.name }))
+    ],
+    [categories]
+  );
 
   const submit = async (event) => {
     event.preventDefault();
@@ -56,12 +64,7 @@ export default function ReservationsPage() {
         <div className="space-y-4">
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-slate-700">Category</span>
-            <select className="field-glass" value={form.room_category_id} onChange={(event) => setForm({ ...form, room_category_id: event.target.value })}>
-              <option value="">Select category</option>
-              {categories.map((category) => (
-                <option value={category.id} key={category.id}>{category.name}</option>
-              ))}
-            </select>
+            <GlassSelect value={form.room_category_id} onChange={(value) => setForm({ ...form, room_category_id: value })} options={categoryOptions} />
             {errors.room_category_id && <span className="text-xs text-coral">{errors.room_category_id}</span>}
           </label>
           <div className="grid gap-4 sm:grid-cols-2">

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, RefreshCw } from "lucide-react";
 import { endpoints } from "../api/client";
 import DataTable from "../components/ui/DataTable.jsx";
+import GlassSelect from "../components/ui/GlassSelect.jsx";
 import { useAuthStore } from "../store/authStore";
 
 const initialForm = {
@@ -13,6 +14,8 @@ const initialForm = {
 };
 
 const statusOptions = ["available", "reserved", "occupied", "cleaning", "maintenance", "out_of_service"];
+const roomStatusOptions = statusOptions.map((option) => ({ value: option, label: option.replace(/_/g, " ") }));
+const roomStatusFilterOptions = [{ value: "", label: "All statuses" }, ...roomStatusOptions];
 
 export default function RoomsPage() {
   const [rooms, setRooms] = useState([]);
@@ -48,6 +51,13 @@ export default function RoomsPage() {
     if (form.rate_override && Number(form.rate_override) < 0) next.rate_override = "Rate cannot be negative";
     return next;
   }, [form]);
+  const categoryOptions = useMemo(
+    () => [
+      { value: "", label: "Select category" },
+      ...categories.map((category) => ({ value: String(category.id), label: category.name }))
+    ],
+    [categories]
+  );
 
   const submit = async (event) => {
     event.preventDefault();
@@ -102,17 +112,12 @@ export default function RoomsPage() {
         <div className="space-y-4">
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-slate-700">Category</span>
-            <select
-              className="field-glass"
+            <GlassSelect
               disabled={!canManageRooms}
               value={form.room_category_id}
-              onChange={(event) => setForm({ ...form, room_category_id: event.target.value })}
-            >
-              <option value="">Select category</option>
-              {categories.map((category) => (
-                <option value={category.id} key={category.id}>{category.name}</option>
-              ))}
-            </select>
+              onChange={(value) => setForm({ ...form, room_category_id: value })}
+              options={categoryOptions}
+            />
             {errors.room_category_id && <span className="text-xs text-coral">{errors.room_category_id}</span>}
           </label>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -143,16 +148,12 @@ export default function RoomsPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
               <span className="mb-1 block text-sm font-medium text-slate-700">Status</span>
-              <select
-                className="field-glass capitalize"
+              <GlassSelect
                 disabled={!canManageRooms}
                 value={form.status}
-                onChange={(event) => setForm({ ...form, status: event.target.value })}
-              >
-                {statusOptions.map((option) => (
-                  <option value={option} key={option}>{option.replace(/_/g, " ")}</option>
-                ))}
-              </select>
+                onChange={(value) => setForm({ ...form, status: value })}
+                options={roomStatusOptions}
+              />
             </label>
             <label className="block">
               <span className="mb-1 block text-sm font-medium text-slate-700">Override rate</span>
@@ -191,12 +192,7 @@ export default function RoomsPage() {
             <h1 className="mt-3 page-title">Room Inventory</h1>
             <p className="page-copy">Categories, pricing, amenities, and live room state</p>
           </div>
-          <select className="field-glass w-full sm:w-52" value={status} onChange={(event) => setStatus(event.target.value)}>
-            <option value="">All statuses</option>
-            {statusOptions.map((option) => (
-              <option value={option} key={option}>{option.replace(/_/g, " ")}</option>
-            ))}
-          </select>
+          <GlassSelect className="w-full sm:w-52" value={status} onChange={setStatus} options={roomStatusFilterOptions} />
         </div>
         <DataTable
           columns={[
