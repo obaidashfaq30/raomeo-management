@@ -50,6 +50,7 @@ export const endpoints = {
   createRoom: (room) => api.post("/rooms", { room }),
   roomCategories: () => api.get("/room_categories"),
   reservations: (params) => api.get("/reservations", { params }),
+  reservationCalendar: (params) => api.get("/reservations/calendar", { params }),
   createReservation: (reservation) => api.post("/reservations", { reservation }),
   guests: (params) => api.get("/guests", { params }),
   search: (params) => api.get("/pareto_search", { params }),

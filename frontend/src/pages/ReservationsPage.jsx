@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarPlus } from "lucide-react";
+import { Link } from "react-router-dom";
+import { CalendarPlus, CalendarRange } from "lucide-react";
 import { endpoints } from "../api/client";
 import DataTable from "../components/ui/DataTable.jsx";
 
@@ -89,10 +90,16 @@ export default function ReservationsPage() {
         </div>
       </form>
       <section>
-        <div className="mb-4">
-          <span className="eyebrow-pill">Bookings</span>
-          <h1 className="mt-3 page-title">Reservations</h1>
-          <p className="page-copy">Bookings, allocation, and status tracking</p>
+        <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+          <div>
+            <span className="eyebrow-pill">Bookings</span>
+            <h1 className="mt-3 page-title">Reservations</h1>
+            <p className="page-copy">Bookings, allocation, and status tracking</p>
+          </div>
+          <Link className="btn-primary h-10 px-4 text-sm" to="/calendar">
+            <CalendarRange size={17} />
+            Calendar
+          </Link>
         </div>
         <DataTable
           columns={[

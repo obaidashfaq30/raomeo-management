@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import DashboardLayout from "../components/layout/DashboardLayout.jsx";
 import BillingPage from "../pages/BillingPage.jsx";
+import BookingCalendarPage from "../pages/BookingCalendarPage.jsx";
 import CheckInOutPage from "../pages/CheckInOutPage.jsx";
 import DashboardPage from "../pages/DashboardPage.jsx";
 import FoodBeveragePage from "../pages/FoodBeveragePage.jsx";
@@ -25,6 +26,7 @@ export default function AppRoutes() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/rooms" element={<RoomsPage />} />
           <Route path="/reservations" element={<ReservationsPage />} />
+          <Route path="/calendar" element={<BookingCalendarPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/check-in-out" element={<CheckInOutPage />} />
           <Route path="/front-desk" element={<FrontDeskPage />} />
