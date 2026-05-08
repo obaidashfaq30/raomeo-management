@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { BedDouble, Bell, CalendarCheck, LogOut, Wrench } from "lucide-react-native";
+import { BedDouble, Bell, CalendarCheck, CalendarRange, LogOut, Wrench } from "lucide-react-native";
 import Screen from "../components/Screen";
 import StatTile from "../components/StatTile";
 import ActionCard from "../components/ActionCard";
@@ -44,6 +44,12 @@ export default function DashboardScreen({ navigation }) {
           label="Room Inventory"
           detail="Availability, categories, pricing"
           onPress={() => navigation.navigate("ModuleList", { moduleKey: "rooms" })}
+        />
+        <ActionCard
+          icon={CalendarRange}
+          label="Booking Calendar"
+          detail="Unified stay timeline"
+          onPress={() => navigation.navigate("Calendar")}
         />
         <ActionCard
           icon={CalendarCheck}
