@@ -7,7 +7,7 @@ export default function Screen({ title, subtitle, children, scroll = true }) {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Body contentContainerStyle={scroll ? styles.content : undefined} style={!scroll ? styles.content : undefined}>
+      <Body contentContainerStyle={scroll ? styles.content : undefined} style={!scroll ? styles.staticContent : undefined}>
         <View style={styles.header}>
           <Text style={styles.title}>{title}</Text>
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
@@ -24,6 +24,11 @@ const styles = StyleSheet.create({
     flex: 1
   },
   content: {
+    gap: 16,
+    padding: 16
+  },
+  staticContent: {
+    flex: 1,
     gap: 16,
     padding: 16
   },

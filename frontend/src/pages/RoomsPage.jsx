@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, RefreshCw } from "lucide-react";
 import { endpoints } from "../api/client";
 import DataTable from "../components/ui/DataTable.jsx";
+import GlassSelect from "../components/ui/GlassSelect.jsx";
 import { useAuthStore } from "../store/authStore";
 
 const initialForm = {
@@ -13,6 +14,8 @@ const initialForm = {
 };
 
 const statusOptions = ["available", "reserved", "occupied", "cleaning", "maintenance", "out_of_service"];
+const roomStatusOptions = statusOptions.map((option) => ({ value: option, label: option.replace(/_/g, " ") }));
+const roomStatusFilterOptions = [{ value: "", label: "All statuses" }, ...roomStatusOptions];
 
 export default function RoomsPage() {
   const [rooms, setRooms] = useState([]);
@@ -48,6 +51,13 @@ export default function RoomsPage() {
     if (form.rate_override && Number(form.rate_override) < 0) next.rate_override = "Rate cannot be negative";
     return next;
   }, [form]);
+  const categoryOptions = useMemo(
+    () => [
+      { value: "", label: "Select category" },
+      ...categories.map((category) => ({ value: String(category.id), label: category.name }))
+    ],
+    [categories]
+  );
 
   const submit = async (event) => {
     event.preventDefault();
@@ -89,32 +99,32 @@ export default function RoomsPage() {
 
   return (
     <div className="grid gap-6 xl:grid-cols-[0.72fr_1.28fr]">
-      <form onSubmit={submit} className="rounded-lg border border-slate-200 bg-white p-5 shadow-panel">
+      <form onSubmit={submit} className="glass-panel-strong rounded-2xl p-5">
         <div className="mb-5 flex items-center gap-2">
-          <Plus className="text-harbor" size={20} />
-          <h1 className="text-lg font-semibold text-ink">New Room</h1>
+          <span className="icon-tile text-harbor">
+            <Plus size={20} />
+          </span>
+          <div>
+            <h1 className="text-lg font-bold text-ink">New Room</h1>
+            <p className="text-xs font-medium text-slate-500">Admin and manager access</p>
+          </div>
         </div>
         <div className="space-y-4">
           <label className="block">
             <span className="mb-1 block text-sm font-medium text-slate-700">Category</span>
-            <select
-              className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm"
+            <GlassSelect
               disabled={!canManageRooms}
               value={form.room_category_id}
-              onChange={(event) => setForm({ ...form, room_category_id: event.target.value })}
-            >
-              <option value="">Select category</option>
-              {categories.map((category) => (
-                <option value={category.id} key={category.id}>{category.name}</option>
-              ))}
-            </select>
+              onChange={(value) => setForm({ ...form, room_category_id: value })}
+              options={categoryOptions}
+            />
             {errors.room_category_id && <span className="text-xs text-coral">{errors.room_category_id}</span>}
           </label>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
               <span className="mb-1 block text-sm font-medium text-slate-700">Room number</span>
               <input
-                className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm"
+                className="field-glass"
                 disabled={!canManageRooms}
                 value={form.number}
                 onChange={(event) => setForm({ ...form, number: event.target.value })}
@@ -127,7 +137,7 @@ export default function RoomsPage() {
               <input
                 type="number"
                 min="0"
-                className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm"
+                className="field-glass"
                 disabled={!canManageRooms}
                 value={form.floor}
                 onChange={(event) => setForm({ ...form, floor: event.target.value })}
@@ -138,16 +148,12 @@ export default function RoomsPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block">
               <span className="mb-1 block text-sm font-medium text-slate-700">Status</span>
-              <select
-                className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm capitalize"
+              <GlassSelect
                 disabled={!canManageRooms}
                 value={form.status}
-                onChange={(event) => setForm({ ...form, status: event.target.value })}
-              >
-                {statusOptions.map((option) => (
-                  <option value={option} key={option}>{option.replace(/_/g, " ")}</option>
-                ))}
-              </select>
+                onChange={(value) => setForm({ ...form, status: value })}
+                options={roomStatusOptions}
+              />
             </label>
             <label className="block">
               <span className="mb-1 block text-sm font-medium text-slate-700">Override rate</span>
@@ -155,7 +161,7 @@ export default function RoomsPage() {
                 type="number"
                 min="0"
                 step="0.01"
-                className="h-10 w-full rounded-lg border border-slate-200 px-3 text-sm"
+                className="field-glass"
                 disabled={!canManageRooms}
                 value={form.rate_override}
                 onChange={(event) => setForm({ ...form, rate_override: event.target.value })}
@@ -165,10 +171,10 @@ export default function RoomsPage() {
             </label>
           </div>
           {notice && (
-            <p className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-700">{notice}</p>
+            <p className="rounded-xl border border-white/60 bg-white/55 px-3 py-2 text-sm font-medium text-slate-700">{notice}</p>
           )}
           <button
-            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-harbor font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+            className="btn-primary h-10 w-full"
             disabled={saving || !canManageRooms}
           >
             {saving ? <RefreshCw className="animate-spin" size={17} /> : <Plus size={17} />}
@@ -182,15 +188,11 @@ export default function RoomsPage() {
       <section className="space-y-5">
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-2xl font-semibold text-ink">Room Inventory</h1>
-            <p className="mt-1 text-sm text-slate-500">Categories, pricing, amenities, and live room state</p>
+            <span className="eyebrow-pill">Inventory</span>
+            <h1 className="mt-3 page-title">Room Inventory</h1>
+            <p className="page-copy">Categories, pricing, amenities, and live room state</p>
           </div>
-          <select className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm" value={status} onChange={(event) => setStatus(event.target.value)}>
-            <option value="">All statuses</option>
-            {statusOptions.map((option) => (
-              <option value={option} key={option}>{option.replace(/_/g, " ")}</option>
-            ))}
-          </select>
+          <GlassSelect className="w-full sm:w-52" value={status} onChange={setStatus} options={roomStatusFilterOptions} />
         </div>
         <DataTable
           columns={[

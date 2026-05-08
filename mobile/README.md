@@ -2,6 +2,13 @@
 
 React Native mobile app for Raomeo Management, built with Expo.
 
+## Included Views
+
+- Dashboard and operational quick actions
+- Unified booking calendar timeline
+- Rooms, reservations, guests, billing, F&B, housekeeping, maintenance, and front desk module lists
+- ParetoSearch across hotel records
+
 ## Run Locally
 
 Start the API stack from the repository root:

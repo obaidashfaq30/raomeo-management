@@ -10,16 +10,17 @@ export default function CheckInOutPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold text-ink">Check-in / Check-out</h1>
-        <p className="mt-1 text-sm text-slate-500">Arrival and departure workflow</p>
+        <span className="eyebrow-pill">Stay flow</span>
+        <h1 className="mt-3 page-title">Check-in / Check-out</h1>
+        <p className="page-copy">Arrival and departure workflow</p>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
         {steps.map((step, index) => (
-          <article key={step.title} className="rounded-lg border border-slate-200 bg-white p-5 shadow-panel">
-            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-harbor/10 text-harbor">
+          <article key={step.title} className="glass-panel rounded-xl p-5 transition hover:-translate-y-0.5">
+            <div className="icon-tile mb-4 text-harbor">
               {index === 2 ? <LogOut size={22} /> : <ClipboardCheck size={22} />}
             </div>
-            <h2 className="text-base font-semibold text-ink">{step.title}</h2>
+            <h2 className="text-base font-bold text-ink">{step.title}</h2>
             <p className="mt-2 text-sm text-slate-500">{step.detail}</p>
           </article>
         ))}

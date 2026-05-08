@@ -1,5 +1,6 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { BedDouble, Gauge, Search, Settings2, UserRound } from "lucide-react-native";
+import { BedDouble, CalendarRange, Gauge, Search, Settings2 } from "lucide-react-native";
+import BookingCalendarScreen from "../screens/BookingCalendarScreen";
 import DashboardScreen from "../screens/DashboardScreen";
 import MoreScreen from "../screens/MoreScreen";
 import ModuleListScreen from "../screens/ModuleListScreen";
@@ -32,10 +33,9 @@ export default function MainTabs() {
       />
       <Tab.Screen name="Search" component={SearchScreen} options={{ tabBarIcon: tabIcon(Search) }} />
       <Tab.Screen
-        name="Guests"
-        component={ModuleListScreen}
-        initialParams={{ moduleKey: "guests" }}
-        options={{ tabBarIcon: tabIcon(UserRound) }}
+        name="Calendar"
+        component={BookingCalendarScreen}
+        options={{ tabBarIcon: tabIcon(CalendarRange) }}
       />
       <Tab.Screen name="More" component={MoreScreen} options={{ tabBarIcon: tabIcon(Settings2) }} />
     </Tab.Navigator>

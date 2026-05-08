@@ -12,8 +12,9 @@ export default function GuestsPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold text-ink">Guest Profiles</h1>
-        <p className="mt-1 text-sm text-slate-500">Details, stay history, preferences, notes, and loyalty</p>
+        <span className="eyebrow-pill">CRM</span>
+        <h1 className="mt-3 page-title">Guest Profiles</h1>
+        <p className="page-copy">Details, stay history, preferences, notes, and loyalty</p>
       </div>
       <DataTable
         columns={[

@@ -13,21 +13,22 @@ export default function FrontDeskPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold text-ink">Front Desk</h1>
-        <p className="mt-1 text-sm text-slate-500">Room status, walk-ins, assistance, and notifications</p>
+        <span className="eyebrow-pill">Guest desk</span>
+        <h1 className="mt-3 page-title">Front Desk</h1>
+        <p className="page-copy">Room status, walk-ins, assistance, and notifications</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-3">
         <StatCard icon={BedDouble} label="Available" value={status.rooms_by_status?.available || 0} tone="harbor" />
         <StatCard icon={CalendarCheck} label="Departures" value={status.departing_today || 0} tone="saffron" />
         <StatCard icon={Bell} label="Open Issues" value={status.open_maintenance || 0} tone="coral" />
       </div>
-      <section className="rounded-lg border border-slate-200 bg-white p-5 shadow-panel">
-        <h2 className="text-base font-semibold text-ink">Assistance Queue</h2>
+      <section className="glass-panel rounded-2xl p-5">
+        <h2 className="text-base font-bold text-ink">Assistance Queue</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {["Early check-in", "Extra towels", "Airport transfer"].map((item) => (
-            <div key={item} className="rounded-lg border border-slate-200 p-4">
-              <p className="font-medium text-ink">{item}</p>
-              <p className="mt-1 text-sm text-slate-500">Pending</p>
+            <div key={item} className="rounded-xl border border-white/60 bg-white/50 p-4">
+              <p className="font-bold text-ink">{item}</p>
+              <p className="mt-1 text-sm font-medium text-slate-500">Pending</p>
             </div>
           ))}
         </div>

@@ -20,6 +20,7 @@ Rails.application.routes.draw do
 
       resources :guests
       resources :reservations do
+        get :calendar, on: :collection
         patch :cancel, on: :member
       end
 

@@ -12,8 +12,9 @@ export default function BillingPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold text-ink">Billing & Invoicing</h1>
-        <p className="mt-1 text-sm text-slate-500">Invoices, payments, taxes, discounts, and refunds</p>
+        <span className="eyebrow-pill">Finance</span>
+        <h1 className="mt-3 page-title">Billing & Invoicing</h1>
+        <p className="page-copy">Invoices, payments, taxes, discounts, and refunds</p>
       </div>
       <DataTable
         columns={[
