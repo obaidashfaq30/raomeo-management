@@ -12,8 +12,9 @@ export default function HousekeepingPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold text-ink">Housekeeping</h1>
-        <p className="mt-1 text-sm text-slate-500">Cleaning status, schedules, assignments, and staff workload</p>
+        <span className="eyebrow-pill">Rooms team</span>
+        <h1 className="mt-3 page-title">Housekeeping</h1>
+        <p className="page-copy">Cleaning status, schedules, assignments, and staff workload</p>
       </div>
       <DataTable
         columns={[

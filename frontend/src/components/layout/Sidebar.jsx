@@ -33,14 +33,14 @@ const navItems = [
 
 export default function Sidebar() {
   return (
-    <aside className="hidden w-72 shrink-0 border-r border-slate-200 bg-white lg:block">
-      <div className="flex h-16 items-center gap-3 border-b border-slate-200 px-5">
-        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-harbor text-white">
+    <aside className="glass-panel-strong sticky top-0 z-20 hidden h-screen w-72 shrink-0 border-r border-white/50 lg:block">
+      <div className="flex h-20 items-center gap-3 border-b border-white/50 px-5">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-harbor text-white shadow-glow">
           <Hotel size={22} />
         </div>
         <div>
-          <p className="text-base font-semibold text-ink">Raomeo</p>
-          <p className="text-xs font-medium text-slate-500">Management</p>
+          <p className="text-base font-bold text-ink">Raomeo</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-harbor">Management</p>
         </div>
       </div>
       <nav className="space-y-1 px-3 py-4">
@@ -50,16 +50,25 @@ export default function Sidebar() {
             to={to}
             className={({ isActive }) =>
               clsx(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition",
-                isActive ? "bg-harbor text-white" : "text-slate-600 hover:bg-mist hover:text-ink"
+                "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition",
+                isActive
+                  ? "bg-ink text-white shadow-lg shadow-slate-900/15"
+                  : "text-slate-600 hover:bg-white/70 hover:text-ink"
               )
             }
           >
-            <Icon size={18} />
+            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/55 text-current transition group-hover:bg-white/80">
+              <Icon size={17} />
+            </span>
             <span>{label}</span>
           </NavLink>
         ))}
       </nav>
+      <div className="mx-4 mt-4 rounded-xl border border-white/60 bg-white/50 p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-harbor">Today</p>
+        <p className="mt-1 text-sm font-semibold text-ink">Operations desk is live</p>
+        <p className="mt-2 text-xs leading-5 text-slate-500">Rooms, billing, service, and staff activity stay connected from this workspace.</p>
+      </div>
     </aside>
   );
 }
