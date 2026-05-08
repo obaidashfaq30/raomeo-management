@@ -1,0 +1,84 @@
+openapi: 3.0.1
+info:
+  title: Raomeo Management API
+  version: v1
+servers:
+  - url: http://localhost:3000
+paths:
+  /api/v1/auth/login:
+    post:
+      summary: Authenticate a user and return a JWT
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: JWT issued
+  /api/v1/rooms:
+    get:
+      summary: List rooms with status and category filters
+      tags:
+        - Rooms
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Rooms returned
+  /api/v1/reservations:
+    get:
+      summary: List reservations
+      tags:
+        - Reservations
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Reservations returned
+    post:
+      summary: Create a reservation
+      tags:
+        - Reservations
+      security:
+        - bearerAuth: []
+      responses:
+        "201":
+          description: Reservation created
+  /api/v1/pareto_search:
+    get:
+      summary: Search guests, reservations, rooms, and invoices
+      tags:
+        - ParetoSearch
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Search results returned
+  /api/v1/reports/revenue:
+    get:
+      summary: Revenue analytics
+      tags:
+        - Reports
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Revenue analytics returned
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

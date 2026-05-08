@@ -1,0 +1,14 @@
+.env
+.DS_Store
+node_modules/
+dist/
+coverage/
+tmp/
+log/*.log
+backend/.env
+backend/log/*
+backend/tmp/*
+backend/storage/*
+frontend/.env
+frontend/node_modules/
+frontend/dist/
